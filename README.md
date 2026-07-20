@@ -75,11 +75,11 @@ It demonstrates how to set up the addon with placeholder tiles and a basic terra
 
 #### Before: placeholders
 
-![Placeholders example](addons/PolyGrid2D/Example/images/example_map_placeholders.png)
+![Placeholders example](addons/PolyGrid2D/Example/screenshots/example_map_placeholders.png)
 
 #### After: drawn map
 
-![Drawn map example](addons/PolyGrid2D/Example/images/example_map_drawn.png)
+![Drawn map example](addons/PolyGrid2D/Example/screenshots/example_map_drawn.png)
 
 ## Notes
 
