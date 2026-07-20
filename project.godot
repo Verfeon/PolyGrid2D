@@ -17,3 +17,7 @@ config/icon="res://icon.svg"
 [dotnet]
 
 project/assembly_name="PolyGrid2D"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/PolyGrid2D/plugin.cfg")
