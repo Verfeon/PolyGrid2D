@@ -1,0 +1,19 @@
+# Godot 4+ specific ignores
+.godot/
+.android/
+android/
+exports/
+build/
+dist/
+*.import
+*.uid
+*.tmp
+*.log
+*.exe
+*.pck
+*.zip
+*.7z
+
+# Editor / IDE files
+.vscode/
+.idea/
