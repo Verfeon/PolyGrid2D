@@ -54,6 +54,7 @@ The `TerrainGenerator` script can generate terrain based on a `Noise` resource a
 Draw in the `PolyGridMap` using the placeholders and it will automatically draw in the terrain layers.
 
 Typical workflow:
+
 - Create a `PolyGridMap`
 - Assign one or more visual layers
 - Configure placeholders in the tile set
@@ -87,4 +88,4 @@ It demonstrates how to set up the addon with placeholder tiles and a basic terra
 
 ## License
 
-This project currently does not specify a license. If you plan to redistribute or publish it, add an appropriate license file.
+This project is released under the MIT License. See [LICENSE](LICENSE) for details.
