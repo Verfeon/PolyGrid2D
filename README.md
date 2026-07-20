@@ -32,8 +32,9 @@ It is designed for projects that need procedural terrain transitions, variant se
 
 1. Copy or clone this repository into your Godot project.
 2. Make sure the addon folder is available at `res://addons/PolyGrid2D`.
-3. Open the project in Godot and ensure the addon is recognized by the editor.
-4. Use the example scene in [addons/PolyGrid2D/Example/poly_grid_example.tscn](addons/PolyGrid2D/Example/poly_grid_example.tscn) as a starting point.
+3. Godot recognizes this addon through `addons/PolyGrid2D/plugin.cfg`.
+4. Open the project in Godot and enable the addon in `Project > Project Settings > Plugins`.
+5. Use the example scene in [addons/PolyGrid2D/Example/poly_grid_example.tscn](addons/PolyGrid2D/Example/poly_grid_example.tscn) as a starting point.
 
 ## Usage
 
