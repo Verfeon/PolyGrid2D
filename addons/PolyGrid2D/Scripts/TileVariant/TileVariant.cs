@@ -1,15 +1,18 @@
 using Godot;
 
-public partial class TileVariant
+namespace PolyGrid2D
 {
-    public Vector2I AtlasCoords;
-    public float Probability;
-    public int SourceId;
-
-    public TileVariant(Vector2I coords, float probability, int sourceId)
+    public partial class TileVariant
     {
-        AtlasCoords = coords;
-        Probability = probability;
-        SourceId = sourceId;
+        public Vector2I AtlasCoords;
+        public float Probability;
+        public int SourceId;
+
+        public TileVariant(Vector2I coords, float probability, int sourceId)
+        {
+            AtlasCoords = coords;
+            Probability = probability;
+            SourceId = sourceId;
+        }
     }
 }
