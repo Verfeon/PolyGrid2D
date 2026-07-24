@@ -6,7 +6,16 @@ using Godot;
 [GlobalClass, Tool]
 public partial class TerrainGenerator : Node
 {
-	[Export] private PolyGridMap _polyGridMap;
+	private PolyGridMap _polyGridMap;
+	[Export] public PolyGridMap PolyGridMap
+	{
+		get => _polyGridMap;
+		set
+		{
+			_polyGridMap = value;
+			NotifyPropertyListChanged();
+		}
+	}
 	[Export] private Noise _noise = null;
 	[Export] private Vector2I _position = new (0, 0);
 	[Export] private Vector2I _size = new (0, 0);
@@ -26,6 +35,8 @@ public partial class TerrainGenerator : Node
 
 	public override Godot.Collections.Array<Godot.Collections.Dictionary> _GetPropertyList()
 	{
+		if (_polyGridMap == null) return [];
+		
 		Godot.Collections.Array<Godot.Collections.Dictionary> properties = [];
 
 

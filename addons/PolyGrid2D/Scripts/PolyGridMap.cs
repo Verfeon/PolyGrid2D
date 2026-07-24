@@ -5,7 +5,7 @@ using Godot;
 [GlobalClass, Tool]
 public partial class PolyGridMap : TileMapLayer
 {
-	[Export] public Godot.Collections.Array<TileMapLayer> VisualLayers;
+	[Export] public Godot.Collections.Array<TileMapLayer> VisualLayers = [];
 	private int _variantSeed = 0;
 	[Export] public int VariantSeed
 	{
@@ -78,6 +78,10 @@ public partial class PolyGridMap : TileMapLayer
 
 	private void InitializeCustomDataLayer()
 	{
+		if (TileSet == null)
+		{
+			TileSet = new TileSet();
+		}
 		if (!TileSet.HasCustomDataLayerByName(_customLayerIdName))
 		{
 			int customDataLayersCount = TileSet.GetCustomDataLayersCount();

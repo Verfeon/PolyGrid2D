@@ -12,7 +12,7 @@ It is designed for projects that need procedural terrain transitions, variant se
 - Optional parallel updates for larger areas
 - Example scene and assets included in the addon folder
 - Built for Godot 4.5 with C# support
-- Uses 16-tilesets, which reduces the workload for artists by simplifying tile creation and setup
+- Uses 15-tilesets, which reduces the workload for artists by simplifying tile creation and setup
 
 ## Requirements
 
@@ -80,6 +80,11 @@ It demonstrates how to set up the addon with placeholder tiles and a basic terra
 #### After: drawn map
 
 ![Drawn map example](addons/PolyGrid2D/Example/screenshots/example_map_drawn.png)
+
+### Demo videos
+
+- [Setup example](addons/PolyGrid2D/Example/videos/example_setup_PolyGrid2D.mp4)
+- [Terrain generation example](addons/PolyGrid2D/Example/videos/example_terrain_generation_PolyGrid2D.mp4)
 
 ## Notes
 
