@@ -8,6 +8,7 @@ namespace PolyGrid2D
 	/// Main tilemap node that applies placeholder-based terrain logic and updates visual layers.
 	/// </summary>
 	[GlobalClass, Tool]
+	[Icon("res://addons/PolyGrid2D/icon.png")]
 	public partial class PolyGridMap : TileMapLayer
 	{
 		/// <summary>
