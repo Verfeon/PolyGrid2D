@@ -3,6 +3,9 @@ using Godot;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Computes the adjacency mask used to determine which terrain variant should be selected for a tile.
+	/// </summary>
 	public static partial class MaskCalculator	
 	{
 		private static readonly Vector2I TL = new(-1, -1);

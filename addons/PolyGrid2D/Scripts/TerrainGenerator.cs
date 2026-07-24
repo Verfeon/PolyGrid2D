@@ -3,26 +3,51 @@ using Godot;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Generates terrain by sampling a noise resource and placing placeholder tiles according to weighted layers.
+	/// </summary>
 	[GlobalClass, Tool]
 	public partial class TerrainGenerator : Node
 	{
 		private PolyGridMap _polyGridMap;
+		/// <summary>
+		/// The PolyGridMap node that will receive the generated terrain cells.
+		/// </summary>
 		[Export] public PolyGridMap PolyGridMap
-		{
-			get => _polyGridMap;
-			set
 			{
-				_polyGridMap = value;
-				NotifyPropertyListChanged();
+				get => _polyGridMap;
+				set
+				{
+					_polyGridMap = value;
+					NotifyPropertyListChanged();
+				}
 			}
-		}
+
+		/// <summary>
+		/// Noise resource used to decide which terrain layer should be painted.
+		/// </summary>
 		[Export] private Noise _noise = null;
+		
+		/// <summary>
+		/// Top-left position of the generated terrain area.
+		/// </summary>
 		[Export] private Vector2I _position = new (0, 0);
+
+		/// <summary>
+		/// Size of the terrain area to generate.
+		/// </summary>
 		[Export] private Vector2I _size = new (0, 0);
+		
+		/// <summary>
+		/// Clears the target map before generating new terrain when enabled.
+		/// </summary>
 		[Export] private bool _clearBeforeGeneration = true;
 		
 		[ExportToolButton("Generate")] public Callable GenerateCallable => Callable.From(() => {Generate();});
 
+		/// <summary>
+		/// Weight assigned to each terrain layer for the generation process.
+		/// </summary>
 		[Export] private Godot.Collections.Dictionary<string, float> _terrainLayersWeights = [];
 
 		public override void _ValidateProperty(Godot.Collections.Dictionary property)

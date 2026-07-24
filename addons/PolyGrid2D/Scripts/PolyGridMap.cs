@@ -4,11 +4,21 @@ using Godot;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Main tilemap node that applies placeholder-based terrain logic and updates visual layers.
+	/// </summary>
 	[GlobalClass, Tool]
 	public partial class PolyGridMap : TileMapLayer
 	{
+		/// <summary>
+		/// List of visual layers that the polygrid system updates from the placeholder logic layer.
+		/// </summary>
 		[Export] public Godot.Collections.Array<TileMapLayer> VisualLayers = [];
+
 		private int _variantSeed = 0;
+		/// <summary>
+		/// Seed used to make tile selection deterministic when several variants are possible.
+		/// </summary>
 		[Export] public int VariantSeed
 		{
 			get => _variantSeed;
@@ -19,15 +29,18 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Shows or hides the logic grid in the editor by controlling the node opacity.
+		/// </summary>
 		[Export] public bool ShowLogicGrid 
-		{ 
-			get => _showLogicGrid;
-			set 
-			{
-				_showLogicGrid = value;
-				UpdateVisibility();
+			{ 
+				get => _showLogicGrid;
+				set 
+				{
+					_showLogicGrid = value;
+					UpdateVisibility();
+				}
 			}
-		}
 		private bool _showLogicGrid = false;
 
 		[ExportToolButton("Update")] 
@@ -73,11 +86,17 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Updates the node visibility state so the logic grid is shown or hidden in the editor.
+		/// </summary>
 		private void UpdateVisibility()
 		{
 			SelfModulate = _showLogicGrid ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0);
 		}
 
+		/// <summary>
+		/// Ensures the tile set contains the custom data layer used to identify placeholder tiles.
+		/// </summary>
 		private void InitializeCustomDataLayer()
 		{
 			if (TileSet == null)
@@ -102,6 +121,9 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Aligns the visual layers with the main tile set and applies the correct offset.
+		/// </summary>
 		private void InitializeLayers()
 		{
 			if (!IsValidConfiguration()) return;
@@ -124,6 +146,9 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Rebuilds the entire grid from the current used rectangle.
+		/// </summary>
 		public void UpdateFullGrid()
 		{
 			Rect2I usedRect = GetUsedRect();
@@ -139,6 +164,10 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Updates all cells inside the given area using the current tile variants and masks.
+		/// </summary>
+		/// <param name="area">The rectangular area to update.</param>
 		private void UpdateArea(Rect2I area)
 		{
 			if (!IsValidConfiguration()) return;
@@ -186,6 +215,10 @@ namespace PolyGrid2D
 			}
 		}
 
+		/// <summary>
+		/// Updates a large area in parallel by splitting the work into chunks.
+		/// </summary>
+		/// <param name="area">The rectangular area to update.</param>
 		private async void UpdateAreaParallel(Rect2I area)
 		{
 			if (!IsValidConfiguration()) return;
@@ -229,6 +262,10 @@ namespace PolyGrid2D
 			public TileVariant Tile;
 		}
 
+		/// <summary>
+		/// Computes all tile updates for a chunk of the grid.
+		/// </summary>
+		/// <param name="chunk">The chunk rectangle to process.</param>
 		private List<CellUpdate> ComputeChunkMasks(Rect2I chunk)
 		{
 			List<CellUpdate> updates = new();
@@ -269,6 +306,9 @@ namespace PolyGrid2D
 			return updates;
 		}
 
+		/// <summary>
+		/// Checks whether the node has the required layers and tile set configuration to run.
+		/// </summary>
 		private bool IsValidConfiguration()
 		{
 			if (VisualLayers == null || VisualLayers.Count == 0 || TileSet == null)
@@ -288,6 +328,11 @@ namespace PolyGrid2D
 			return true;
 		}
 
+		/// <summary>
+		/// Finds the placeholder tile coordinates associated with a specific layer id.
+		/// </summary>
+		/// <param name="layerId">The layer id to look for.</param>
+		/// <param name="placeholderCoords">The matching placeholder coordinates, if any.</param>
 		public bool TryFindPlaceholderByLayerId(int layerId, out Vector2I placeholderCoords)
 		{
 			TileSetAtlasSource source = TileSet.GetSource(TileSet.GetSourceId(0)) as TileSetAtlasSource;

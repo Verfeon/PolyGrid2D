@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Builds and stores the tile variant sets needed to resolve terrain visuals efficiently.
+	/// </summary>
 	public class TileVariantCache
 	{
 		private Dictionary<int, LayerCache> _cache = new Dictionary<int, LayerCache>();

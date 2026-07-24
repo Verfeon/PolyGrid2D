@@ -1,5 +1,8 @@
 using Godot;
 
+/// <summary>
+/// Minimal Godot editor plugin entry point for the PolyGrid2D addon.
+/// </summary>
 [Tool]
 public partial class PolyGrid2DEditorPlugin : EditorPlugin
 {

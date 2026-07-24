@@ -3,6 +3,9 @@ using Godot;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Selects a tile variant for a given position, layer, and mask using deterministic randomness.
+	/// </summary>
 	public static partial class TileVariantSelector
 	{
 		private static HashSet<string> _loggedErrors = new();

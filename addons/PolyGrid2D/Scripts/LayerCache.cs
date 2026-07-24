@@ -2,6 +2,9 @@ using System;
 
 namespace PolyGrid2D
 {
+	/// <summary>
+	/// Stores the available tile variants grouped by mask value for a single visual layer.
+	/// </summary>
 	public partial class LayerCache
 	{
 		public const int MASK_COUNT = 16;
