@@ -120,12 +120,12 @@ namespace PolyGrid2D
 		{
 			if (_polyGridMap == null)
 			{
-				GD.PushWarning("No PolyGridMap given for generation.");
+				GD.Print("No PolyGridMap given for generation.");
 				return;
 			}
 			if (_noise == null)
 			{
-				GD.PushWarning("No noise map given for generation.");
+				GD.Print("No noise map given for generation.");
 				return;
 			}
 			if (_clearBeforeGeneration) _polyGridMap.Clear();

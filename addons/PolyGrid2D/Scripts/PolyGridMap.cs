@@ -116,7 +116,7 @@ namespace PolyGrid2D
 			{
 				if (!TryFindPlaceholderByLayerId(i, out Vector2I _))
 				{
-					GD.PushWarning("Don't forget to associate the layer ids with the placeholders in the PolyGridMap's TileSet.");
+					GD.Print("Don't forget to associate the layer ids with the placeholders in the PolyGridMap's TileSet.");
 					return;
 				}
 			}
@@ -140,7 +140,7 @@ namespace PolyGrid2D
 				{
 					if (layer.TileSet.TileSize != TileSet.TileSize)
 					{
-						GD.PushWarning($"The layer {layer.Name} has a different tile size than the MultiGridController's");
+						GD.Print($"The layer {layer.Name} has a different tile size than the MultiGridController's");
 					}
 					layer.Position = offset;
 				}
