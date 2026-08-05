@@ -44,8 +44,19 @@ namespace PolyGrid2D
 			}
 		private bool _showLogicGrid = false;
 
+		private LayersInitializer layersInitializer;
+
+		[ExportToolButton("Initialize layers")] 
+		private Callable _InitializeLayersCallable => Callable.From(() => {
+			InitializeLayers();
+			layersInitializer ??= new LayersInitializer();
+
+			layersInitializer.InitializeAllLayers(this);
+		});
+
+
 		[ExportToolButton("Update")] 
-		private Callable _update => Callable.From(() => {
+		private Callable _updateCallable => Callable.From(() => {
 			InitializeLayers();
 			_tileCache.Build(VisualLayers);
 			UpdateFullGrid();
