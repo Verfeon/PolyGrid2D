@@ -16,8 +16,6 @@ namespace PolyGrid2D
 
         private void InitializeLayer(PolyGridMap polyGrid, TileMapLayer layer)
         {
-            GD.Print($"Initializing layer {layer.Name}");
-            
             TileSet placeholderTileSet = polyGrid.TileSet;
             
 			Vector2 offset = (Vector2)placeholderTileSet.TileSize / -2f;
@@ -82,7 +80,11 @@ namespace PolyGrid2D
         {
             TileSet layerTileSet = layer.TileSet;
 
-            TileSetSource source = layerTileSet.GetSource(layerTileSet.GetSourceId(0));
+            int sourceId = layerTileSet.GetSourceId(0);
+            if (!layerTileSet.HasSource(sourceId)) return;
+
+            TileSetSource source = layerTileSet.GetSource(sourceId);
+            
             int terrainSetIndex = GetTerrainSetIndex(layer);
             int terrainIndex = GetTerrainIndex(layer, terrainSetIndex);
 
@@ -98,7 +100,6 @@ namespace PolyGrid2D
                     tileData.TerrainSet = terrainSetIndex;
                     tileData.Terrain = terrainIndex;
 
-                    GD.Print($"Computing peering bits at {coords}..."); 
                     ComputeTilePeeringBits(image, region, tileData);
                 }
             }
@@ -106,75 +107,43 @@ namespace PolyGrid2D
 
         private void ComputeTilePeeringBits(Image image, Rect2I region, TileData tileData)
         {
-            float pixelPercentageThreshold = 0.8f;
-            float alphaThreshold = 0.05f;
-            int pixelCountPerCorner = region.Area/4;
-            GD.Print($"Pixel count per corner : {pixelCountPerCorner}");
+            const float pixelPercentageThreshold = 0.8f;
+            const float alphaThreshold = 0.05f;
+            int pixelCountPerCorner = region.Area / 4;
 
-            int notEmptyPixelsCount = 0;
-            for (int x = region.Position.X; x < region.GetCenter().X; x++)
-            {  
-                for (int y = region.Position.Y; y < region.GetCenter().Y; y++)
+            var corners = new (Rect2I area, TileSet.CellNeighbor neighbor)[]
+            {
+                (new Rect2I(region.Position, region.GetCenter() - region.Position), TileSet.CellNeighbor.TopLeftCorner),
+                (new Rect2I(new Vector2I(region.GetCenter().X, region.Position.Y), new Vector2I(region.End.X - region.GetCenter().X, region.GetCenter().Y - region.Position.Y)), TileSet.CellNeighbor.TopRightCorner),
+                (new Rect2I(new Vector2I(region.Position.X, region.GetCenter().Y), new Vector2I(region.GetCenter().X - region.Position.X, region.End.Y - region.GetCenter().Y)), TileSet.CellNeighbor.BottomLeftCorner),
+                (new Rect2I(region.GetCenter(), region.End - region.GetCenter()), TileSet.CellNeighbor.BottomRightCorner),
+            };
+
+            foreach (var (area, neighbor) in corners)
+            {
+                int opaquePixels = CountOpaquePixels(image, area, alphaThreshold);
+                if (opaquePixels != 0 && (float)opaquePixels / pixelCountPerCorner > pixelPercentageThreshold)
                 {
-                    notEmptyPixelsCount += image.GetPixel(x, y).A > alphaThreshold ? 1 : 0;
+                    tileData.SetTerrainPeeringBit(neighbor, 0);
                 }
             }
-            GD.Print($"Not empty pixels count top left : {notEmptyPixelsCount}");
-            if (notEmptyPixelsCount != 0 && (float)notEmptyPixelsCount/pixelCountPerCorner > pixelPercentageThreshold)
+        }
+
+        private int CountOpaquePixels(Image image, Rect2I region, float alphaThreshold)
+        {
+            int count = 0;
+            for (int x = region.Position.X; x < region.End.X; x++)
             {
-                GD.Print($"Add peering bit top left");
-                tileData.SetTerrainPeeringBit(TileSet.CellNeighbor.TopLeftCorner, 0);
-            }
-            
-            notEmptyPixelsCount = 0;
-            for (int x = region.GetCenter().X; x < region.End.X; x++)
-            {  
-                for (int y = region.Position.Y; y < region.GetCenter().Y; y++)
+                for (int y = region.Position.Y; y < region.End.Y; y++)
                 {
-                    notEmptyPixelsCount += image.GetPixel(x, y).A > alphaThreshold ? 1 : 0;
+                    count += image.GetPixel(x, y).A > alphaThreshold ? 1 : 0;
                 }
             }
-            GD.Print($"Not empty pixels count top right : {notEmptyPixelsCount}");
-            if (notEmptyPixelsCount != 0 && (float)notEmptyPixelsCount/pixelCountPerCorner > pixelPercentageThreshold)
-            {
-                GD.Print($"Add peering bit top right");
-                tileData.SetTerrainPeeringBit(TileSet.CellNeighbor.TopRightCorner, 0);
-            }
-            
-            notEmptyPixelsCount = 0;
-            for (int x = region.Position.X; x < region.GetCenter().X; x++)
-            {  
-                for (int y = region.GetCenter().Y; y < region.End.Y; y++)
-                {
-                    notEmptyPixelsCount += image.GetPixel(x, y).A > alphaThreshold ? 1 : 0;
-                }
-            }
-            GD.Print($"Not empty pixels count bottom left : {notEmptyPixelsCount}");
-            if (notEmptyPixelsCount != 0 && (float)notEmptyPixelsCount/pixelCountPerCorner > pixelPercentageThreshold)
-            {
-                GD.Print($"Add peering bit bottom left");
-                tileData.SetTerrainPeeringBit(TileSet.CellNeighbor.BottomLeftCorner, 0);
-            }
-            
-            notEmptyPixelsCount = 0;
-            for (int x = region.GetCenter().X; x < region.End.X; x++)
-            {  
-                for (int y = region.GetCenter().Y; y < region.End.Y; y++)
-                {
-                    notEmptyPixelsCount += image.GetPixel(x, y).A > alphaThreshold ? 1 : 0;
-                }
-            }
-            GD.Print($"Not empty pixels count bottom right : {notEmptyPixelsCount}");
-            if (notEmptyPixelsCount != 0 && (float)notEmptyPixelsCount/pixelCountPerCorner > pixelPercentageThreshold)
-            {
-                GD.Print($"Add peering bit bottom right");
-                tileData.SetTerrainPeeringBit(TileSet.CellNeighbor.BottomRightCorner, 0);
-            }
+            return count;
         }
 
         private void DoForAllLayers(PolyGridMap polyGrid, Action<PolyGridMap, TileMapLayer> action)
         {
-            
             if (polyGrid == null)
             {
                 throw new Exception("PolyGridMap is null.");
@@ -183,12 +152,6 @@ namespace PolyGrid2D
             {
                 throw new Exception("PolyGridMap's VisualLayers is null.");
             }
-            int layerCount = polyGrid.VisualLayers.Count;
-            if (layerCount == 0)
-            {
-                GD.Print("No layer added to PolyGridMap.");
-            }
-
 
             foreach (TileMapLayer layer in polyGrid.VisualLayers)
             {
