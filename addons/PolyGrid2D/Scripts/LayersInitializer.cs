@@ -8,42 +8,45 @@ namespace PolyGrid2D
     /// </summary>
     public partial class LayersInitializer : Node
     {
-        private string _terrainName = "PolyGrid2D's Terrain";
+        private readonly string _terrainName = "PolyGrid2D's Terrain";
         public void InitializeAllLayers(PolyGridMap polyGrid)
         {
-            if (polyGrid == null)
-            {
-                throw new Exception("PolyGridMap is null.");
-            }
-            if (polyGrid.VisualLayers == null)
-            {
-                throw new Exception("PolyGridMap's VisualLayers is null.");
-            }
-            int layerCount = polyGrid.VisualLayers.Count;
-            if (layerCount == 0)
-            {
-                GD.Print("No layer to initialize.");
-            }
-
-
-            foreach (TileMapLayer layer in polyGrid.VisualLayers)
-            {
-                InitializeLayer(polyGrid, layer);
-            }
+            DoForAllLayers(polyGrid, InitializeLayer);
         }
 
         private void InitializeLayer(PolyGridMap polyGrid, TileMapLayer layer)
         {
             GD.Print($"Initializing layer {layer.Name}");
             
-            TileSet placeHolderTileSet = polyGrid.TileSet;
+            TileSet placeholderTileSet = polyGrid.TileSet;
             
+			Vector2 offset = (Vector2)placeholderTileSet.TileSize / -2f;
+			layer.Position = offset;
             layer.TileSet ??= new();
-            layer.TileSet.TileShape = placeHolderTileSet.TileShape;
-            layer.TileSet.TileLayout = placeHolderTileSet.TileLayout;
-            layer.TileSet.TileOffsetAxis = placeHolderTileSet.TileOffsetAxis;
-            layer.TileSet.TileSize = placeHolderTileSet.TileSize;
+            layer.TileSet.TileShape = placeholderTileSet.TileShape;
+            layer.TileSet.TileLayout = placeholderTileSet.TileLayout;
+            layer.TileSet.TileOffsetAxis = placeholderTileSet.TileOffsetAxis;
+            layer.TileSet.TileSize = placeholderTileSet.TileSize;
 
+            int terrainSetIndex = GetTerrainSetIndex(layer);
+            int terrainSetsCount = layer.TileSet.GetTerrainSetsCount();
+            if (terrainSetIndex == terrainSetsCount)
+            {
+                layer.TileSet.AddTerrainSet();
+                layer.TileSet.SetTerrainSetMode(terrainSetIndex, TileSet.TerrainMode.Corners);
+            }
+
+            int terrainIndex = GetTerrainIndex(layer, terrainSetIndex);
+            int terrainsCount = layer.TileSet.GetTerrainsCount(terrainSetIndex);
+            if (terrainIndex == terrainsCount)
+            {
+                layer.TileSet.AddTerrain(terrainSetIndex);
+                layer.TileSet.SetTerrainName(terrainSetIndex, terrainIndex, _terrainName);
+            }
+        }
+
+        private int GetTerrainSetIndex(TileMapLayer layer)
+        {
             int terrainSetsCount = layer.TileSet.GetTerrainSetsCount();
             int terrainSetIndex = 0;
             while (terrainSetIndex < terrainSetsCount)
@@ -52,14 +55,13 @@ namespace PolyGrid2D
 
                 terrainSetIndex++;
             }
-            if (terrainSetIndex == terrainSetsCount)
-            {
-                layer.TileSet.AddTerrainSet();
-                layer.TileSet.SetTerrainSetMode(terrainSetIndex, TileSet.TerrainMode.Corners);
-            }
-            
-            int terrainsCount = layer.TileSet.GetTerrainsCount(terrainSetIndex);
 
+            return terrainSetIndex;
+        }
+
+        private int GetTerrainIndex(TileMapLayer layer, int terrainSetIndex)
+        {
+            int terrainsCount = layer.TileSet.GetTerrainsCount(terrainSetIndex);
             int terrainIndex = 0;
             while (terrainIndex < terrainsCount)
             {
@@ -67,20 +69,22 @@ namespace PolyGrid2D
 
                 terrainIndex++;
             }
-            if (terrainIndex == terrainsCount)
-            {
-                layer.TileSet.AddTerrain(terrainSetIndex);
-                layer.TileSet.SetTerrainName(terrainSetIndex, terrainIndex, _terrainName);
-            }
 
-            PaintTerrain(layer, terrainSetIndex, terrainIndex);
+            return terrainIndex;
         }
 
-        private void PaintTerrain(TileMapLayer layer, int terrainSetIndex, int terrainIndex)
+        public void PaintTerrainForAllLayers(PolyGridMap polyGrid)
+        {
+            DoForAllLayers(polyGrid, PaintTerrain);
+        }
+
+        private void PaintTerrain(PolyGridMap polyGrid, TileMapLayer layer)
         {
             TileSet layerTileSet = layer.TileSet;
 
             TileSetSource source = layerTileSet.GetSource(layerTileSet.GetSourceId(0));
+            int terrainSetIndex = GetTerrainSetIndex(layer);
+            int terrainIndex = GetTerrainIndex(layer, terrainSetIndex);
 
             if (source is TileSetAtlasSource atlasSource)
             {
@@ -165,6 +169,30 @@ namespace PolyGrid2D
             {
                 GD.Print($"Add peering bit bottom right");
                 tileData.SetTerrainPeeringBit(TileSet.CellNeighbor.BottomRightCorner, 0);
+            }
+        }
+
+        private void DoForAllLayers(PolyGridMap polyGrid, Action<PolyGridMap, TileMapLayer> action)
+        {
+            
+            if (polyGrid == null)
+            {
+                throw new Exception("PolyGridMap is null.");
+            }
+            if (polyGrid.VisualLayers == null)
+            {
+                throw new Exception("PolyGridMap's VisualLayers is null.");
+            }
+            int layerCount = polyGrid.VisualLayers.Count;
+            if (layerCount == 0)
+            {
+                GD.Print("No layer added to PolyGridMap.");
+            }
+
+
+            foreach (TileMapLayer layer in polyGrid.VisualLayers)
+            {
+                action(polyGrid, layer);
             }
         }
     }

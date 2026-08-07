@@ -45,19 +45,17 @@ namespace PolyGrid2D
 		private bool _showLogicGrid = false;
 
 		private LayersInitializer layersInitializer;
-
-		[ExportToolButton("Initialize layers")] 
-		private Callable _InitializeLayersCallable => Callable.From(() => {
-			InitializeLayers();
+		
+		[ExportToolButton("Paint layer's terrain")] 
+		private Callable _PaintLayersTerrainCallable => Callable.From(() => {
 			layersInitializer ??= new LayersInitializer();
 
-			layersInitializer.InitializeAllLayers(this);
+			layersInitializer.PaintTerrainForAllLayers(this);
 		});
 
 
 		[ExportToolButton("Update")] 
 		private Callable _updateCallable => Callable.From(() => {
-			InitializeLayers();
 			_tileCache.Build(VisualLayers);
 			UpdateFullGrid();
 		});
@@ -69,7 +67,6 @@ namespace PolyGrid2D
 		public override void _Ready()
 		{
 			InitializeCustomDataLayer();
-			InitializeLayers();
 			_tileCache.Build(VisualLayers);
 			if (!Engine.IsEditorHint()) _showLogicGrid = false;
 			UpdateVisibility();
@@ -129,31 +126,6 @@ namespace PolyGrid2D
 				{
 					GD.Print("Don't forget to associate the layer ids with the placeholders in the PolyGridMap's TileSet.");
 					return;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Aligns the visual layers with the main tile set and applies the correct offset.
-		/// </summary>
-		private void InitializeLayers()
-		{
-			if (!IsValidConfiguration()) return;
-
-			Vector2 offset = (Vector2)TileSet.TileSize / -2f;
-			TileMapLayer layer;
-
-			for (int i = 0; i < VisualLayers.Count; i++)
-			{
-				layer = VisualLayers[i];
-
-				if (layer != null && IsInstanceValid(layer))
-				{
-					if (layer.TileSet.TileSize != TileSet.TileSize)
-					{
-						GD.Print($"The layer {layer.Name} has a different tile size than the MultiGridController's");
-					}
-					layer.Position = offset;
 				}
 			}
 		}
