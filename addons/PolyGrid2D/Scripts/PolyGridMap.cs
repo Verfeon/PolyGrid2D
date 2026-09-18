@@ -62,6 +62,7 @@ namespace PolyGrid2D
 
 		private TileVariantCache _tileCache = new ();
 		private readonly int MIN_PARALLEL_AREA = 10000;
+		private readonly int MAX_UPDATE_TIME_PER_FRAME_IN_MS = 10;
 		private readonly string _customLayerIdName = "layerId";
 
 		public override void _Ready()
@@ -152,7 +153,7 @@ namespace PolyGrid2D
 		/// Updates all cells inside the given area using the current tile variants and masks.
 		/// </summary>
 		/// <param name="area">The rectangular area to update.</param>
-		private void UpdateArea(Rect2I area)
+		private async Task UpdateArea(Rect2I area)
 		{
 			if (!IsValidConfiguration()) return;
 
@@ -161,6 +162,7 @@ namespace PolyGrid2D
 			Vector2I visualPos;
 			TileMapLayer visualLayer;
 			TileVariant tile;
+			ulong startTime = Time.GetTicksMsec();
 
 			for (int x = area.Position.X; x < area.End.X; x++)
 			{
@@ -194,6 +196,12 @@ namespace PolyGrid2D
 								visualLayer.EraseCell(visualPos);
 							}
 						}
+
+						if ((int)(Time.GetTicksMsec() - startTime) >= MAX_UPDATE_TIME_PER_FRAME_IN_MS)
+						{
+							await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+							startTime = Time.GetTicksMsec();
+						}
 					}
 				}
 			}
@@ -221,7 +229,8 @@ namespace PolyGrid2D
 			}
 
 			var results = await Task.WhenAll(tasks);
-
+			ulong startTime = Time.GetTicksMsec();
+			
 			foreach (var chunkUpdates in results)
 			{
 				foreach (var update in chunkUpdates)
@@ -235,6 +244,12 @@ namespace PolyGrid2D
 					{
 						layer.SetCell(update.Position, update.Tile.SourceId, update.Tile.AtlasCoords);
 					}
+
+						if ((int)(Time.GetTicksMsec() - startTime) >= MAX_UPDATE_TIME_PER_FRAME_IN_MS)
+						{
+							await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+							startTime = Time.GetTicksMsec();
+						}
 				}
 			}
 		}

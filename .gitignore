@@ -17,3 +17,6 @@ mono_crash.*.json
 # Editor / IDE files
 .vscode/
 .idea/
+
+
+addons/PolyGrid2D/Example/testScene.tscn
